@@ -2,12 +2,12 @@ const SCRIPT_VERSION = "7.0"; // Simplified VIP Selection, Manual Advance, Zero 
 // --- Firebase Configuration ---
 // !!! ERSETZE DIES MIT DEINER EIGENEN FIREBASE KONFIGURATION FÜR DIE NEUE VERSION !!!
 const firebaseConfig = {
-  apiKey: "AIzaSyAT8L9vDqFHyGB-MybtcLEBgCALuNflTZY",
-  authDomain: "red-train-rotation-tool.firebaseapp.com",
-  projectId: "red-train-rotation-tool",
-  storageBucket: "red-train-rotation-tool.firebasestorage.app",
-  messagingSenderId: "178389819926",
-  appId: "1:178389819926:web:2c98d76090faae4b0ccb37"
+  apiKey: "AIzaSyAaRF7n14TDhTltcK7ZC_vuSBVeUnd2dtM",
+  authDomain: "red-train-rotation-tool-2.firebaseapp.com",
+  projectId: "red-train-rotation-tool-2",
+  storageBucket: "red-train-rotation-tool-2.firebasestorage.app",
+  messagingSenderId: "638755313613",
+  appId: "1:638755313613:web:42e2e1ce19d4b124fe1684"
 };
 try { firebase.initializeApp(firebaseConfig); } catch (e) { console.error("Firebase Init Error", e); alert("Could not initialize Firebase."); }
 const db = firebase.firestore();
