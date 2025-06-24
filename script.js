@@ -56,7 +56,7 @@ const initialMembersConfig = [
     { name: "Dfyra", rank: "Member"}, { name: "diRty freNk", rank: "Member"},
     { name: "Egius", rank: "Member"}, { name: "Ever4", rank: "Member"},
     { name: "F L A C", rank: "Member"}, { name: "Faluche", rank: "Member"},
-    { name: "Fire", rank: "Member"}, { name: "FireXice (Bibot)", rank: "Member"},
+    { name: "Fire", rank: "Member"}, { name: "FireXice", rank: "Member"},
     { name: "Foggis", rank: "Member"}, { name: "Gekkegerrittttt", rank: "Member"},
     { name: "GhósT", rank: "Member"}, { name: "Ghthegreat", rank: "Member"},
     { name: "Goddes Ninopatra", rank: "Member"}, { name: "Gorkiules", rank: "Member"},
