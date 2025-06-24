@@ -98,7 +98,7 @@ const initialVipCountsConfig = {
     "Aminos77": 1, "B1wizz": 1, "Bekim1": 1, "Biloute 62": 1, "BlackPush": 1, "BlackWizardUA": 1,
     "blacky12345": 2, "B L A D É": 1, "BOREDOFTHISSHTGAME": 1, "Charly232": 1, "Chris": 1, "Cocsi29400": 1,
     "Commander BLad": 2, "Dario217": 1, "Darkknight": 1, "depechefann": 1, "Dfyra": 1, "diRty freNk": 1,
-    "Egius": 1, "Ever4": 1, "F L A C": 1, "Faluche": 1, "Fire": 2, "FireXice (Bibot)": 0, "Foggis": 2,
+    "Egius": 1, "Ever4": 1, "F L A C": 1, "Faluche": 1, "Fire": 2, "FireXice": 0, "Foggis": 2,
     "Gekkegerrittttt": 1, "GhósT": 1, "Ghthegreat": 1, "Goddes Ninopatra": 0, "Gorkiules": 1, "Gunnovic": 0,
     "Héra217": 1, "ILYES B": 0, "IRONHAMMER": 1, "JackToo": 1, "Jaista": 1, "jarako": 1, "jassådu": 0,
     "joneboi": 1, "Jotersan": 1, "Juantxo79": 0, "Just Melo": 1, "KezuaL": 1, "KFCPov3r": 0, "KingStridez": 2,
