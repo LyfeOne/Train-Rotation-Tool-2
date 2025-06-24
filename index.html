@@ -74,23 +74,34 @@
         </section>
 
         <section class="member-section">
-            <h2>Manage Alliance Members</h2>
-            <div id="add-member-form-container">
-                 <h3>Add New Member</h3>
-                 <form id="add-member-form" class="form-group">
-                     <label for="new-member-name">Name:</label> <input type="text" id="new-member-name" required>
-                     <label for="new-member-rank">Rank:</label>
-                     <select id="new-member-rank">
-                         <option value="Member">Member</option>
-                         <option value="R4">R4</option>
-                         <option value="R5">R5</option>
-                     </select>
-                     <button type="submit" class="btn-primary" style="margin-top: 10px;">Add Member</button>
-                 </form>
-            </div>
-            <details id="member-list-details" open style="margin-top: 20px; border-top: 1px solid var(--border-color); padding-top: 15px;">
-                <summary> Show/Hide Current Members (<span id="member-count">0</span>) </summary>
-                <ul id="member-list"></ul>
+            <!-- Die Überschrift bleibt außerhalb, oder kommt in das <summary> wenn gewünscht -->
+            <!-- H2 bleibt außerhalb für die Sektionsüberschrift -->
+            <h2>Manage Alliance Members</h2> 
+            
+            <details id="manage-members-details" open> {/* NEUES details-Element mit neuer ID, standardmäßig offen */}
+                <summary>Show/Hide Member Management Tools</summary> {/* Aussagekräftigerer Text */}
+
+                <div id="add-member-form-container" style="margin-top: 15px;"> {/* Etwas Abstand nach dem Summary */}
+                     <h3>Add New Member</h3>
+                     <form id="add-member-form" class="form-group">
+                         <label for="new-member-name">Name:</label> <input type="text" id="new-member-name" required>
+                         <label for="new-member-rank">Rank:</label> 
+                         <select id="new-member-rank"> 
+                             <option value="Member">Member</option> 
+                             <option value="R4">R4</option> 
+                             <option value="R5">R5</option> 
+                         </select>
+                         <button type="submit" class="btn-primary" style="margin-top: 10px;">Add Member</button>
+                     </form>
+                </div>
+
+                {/* Das alte details-Element für die Mitgliederliste wird jetzt zu einem normalen div oder wir lassen es so verschachtelt */}
+                {/* Ich empfehle, es einfacher zu halten und das innere <details> zu entfernen oder anders zu gestalten. */}
+                {/* Fürs Erste, lasse ich das innere <details> weg und mache es zu einem normalen Bereich. */}
+                <div id="member-list-container" style="margin-top: 20px; border-top: 1px solid var(--border-color); padding-top: 15px;">
+                    <h3>Current Members (<span id="member-count">0</span>)</h3> {/* Die Überschrift kann hierhin */}
+                    <ul id="member-list"></ul>
+                </div>
             </details>
         </section>
 
