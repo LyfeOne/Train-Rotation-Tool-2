@@ -698,6 +698,10 @@ function sortMembersByName(memberArray) { // Hilfsfunktion zum Sortieren nach Na
     memberArray.sort((a,b) => (a.name || "").localeCompare(b.name || ""));
 }
 
+function toggleEditVipCountMode(memberId) {
+    state.editingVipCountMemberId = state.editingVipCountMemberId === memberId ? null : memberId;
+    renderStatistics(); // Ruft renderStatistics erneut auf, um das Edit-Feld anzuzeigen/auszublenden
+}
 
 async function saveVipCount(memberId, newCountInput) { // Manuelle Anpassung in Statistik
     const newCountString = newCountInput.value;
