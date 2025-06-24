@@ -1,0 +1,364 @@
+/* --- CSS (v7.0 - Simplified VIP Rotation) --- */
+:root {
+    --bg-color-light: #f4f4f8; --text-color-light: #333; --card-bg-light: #fff; --border-color-light: #ddd; --primary-color-light: #007bff; --primary-text-light: #fff; --accent-color-light: #6c757d; --accent-text-light: #fff; --highlight-bg-light: #e9ecef; --input-bg-light: #fff; --input-border-light: #ccc; --button-hover-light: #0056b3; --remove-btn-light: #dc3545; --remove-btn-hover-light: #c82333; --warning-bg-light: #ffeeba; --warning-text-light: #856404; --warning-border-light: #ffdab1; --last-completed-bg-light: #e2e3e5;
+    --bg-color-dark: #22272e; --text-color-dark: #c9d1d9; --card-bg-dark: #2d333b; --border-color-dark: #444c56; --primary-color-dark: #58a6ff; --primary-text-dark: #22272e; --accent-color-dark: #8b949e; --accent-text-dark: #c9d1d9; --highlight-bg-dark: #373e47; --input-bg-dark: #22272e; --input-border-dark: #444c56; --button-hover-dark: #79b8ff; --remove-btn-dark: #f85149; --remove-btn-hover-dark: #da3633; --warning-bg-dark: #4d4124; --warning-text-dark: #ffecb5; --warning-border-dark: #7e6a3c; --last-completed-bg-dark: #30363d;
+
+    --bg-color: var(--bg-color-dark); /* Standard Dark Mode */
+    --text-color: var(--text-color-dark);
+    --card-bg: var(--card-bg-dark);
+    --border-color: var(--border-color-dark);
+    --primary-color: var(--primary-color-dark);
+    --primary-text: var(--primary-text-dark);
+    --accent-color: var(--accent-color-dark);
+    --accent-text: var(--accent-text-dark);
+    --highlight-bg: var(--highlight-bg-dark);
+    --input-bg: var(--input-bg-dark);
+    --input-border: var(--input-border-dark);
+    --button-hover: var(--button-hover-dark);
+    --remove-btn: var(--remove-btn-dark);
+    --remove-btn-hover: var(--remove-btn-hover-dark);
+    --warning-bg: var(--warning-bg-dark);
+    --warning-text: var(--warning-text-dark);
+    --warning-border: var(--warning-border-dark);
+    --last-completed-bg: var(--last-completed-bg-dark);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    padding: 15px;
+}
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+}
+.header h1 { font-size: 1.8em; color: var(--primary-color); }
+
+.controls-section, .member-section, .schedule-section, .stats-section, .admin-section, .vip-zero-count-section {
+    margin-bottom: 30px;
+    padding: 15px;
+    background-color: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+}
+
+h2 { margin-bottom: 15px; color: var(--accent-color); font-size: 1.4em; }
+h3 { margin-bottom: 10px; font-size: 1.2em; }
+
+.form-group { margin-bottom: 15px; }
+label { display: block; margin-bottom: 5px; font-weight: bold; }
+input[type="text"], select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--input-border);
+    border-radius: 4px;
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    margin-bottom: 10px; /* Abstand nach Selects/Inputs */
+}
+#mvp-select, #select-todays-vip { /* Spezifisch für die Auswahl-Dropdowns */
+    margin-bottom: 0; /* Kein extra Abstand, da der Button darunter kommt */
+}
+
+
+button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.2s ease, opacity 0.2s ease;
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+button:disabled {
+    background-color: var(--accent-color);
+    opacity: 0.5;
+    cursor: not-allowed;
+    color: var(--text-color);
+}
+.btn-primary { background-color: var(--primary-color); color: var(--primary-text); }
+.btn-primary:hover:not(:disabled) { background-color: var(--button-hover); }
+.btn-secondary { background-color: var(--accent-color); color: var(--accent-text); }
+.btn-secondary:hover:not(:disabled) { opacity: 0.8; }
+.btn-remove { background-color: var(--remove-btn); color: #fff; font-size: 0.8em; padding: 3px 8px; }
+.btn-remove:hover:not(:disabled) { background-color: var(--remove-btn-hover); }
+
+ul { list-style: none; padding: 0; }
+li {
+    padding: 8px 0;
+    border-bottom: 1px dashed var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+li:last-child { border-bottom: none; }
+li span { margin-right: 10px; word-break: break-word; }
+
+#member-list li .member-info {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+    margin-right: 10px;
+}
+.rank-select-inline {
+    display: inline-block;
+    width: auto;
+    padding: 2px 5px;
+    margin-left: 8px;
+    font-size: 0.9em;
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    border: 1px solid var(--input-border);
+    border-radius: 3px;
+    vertical-align: middle;
+    margin-bottom: 0; /* Inline Selects brauchen keinen unteren Margin */
+}
+
+/* Schedule Display (nur Conductor) */
+#schedule-display ul { padding: 0; list-style: none; }
+#schedule-display ul li {
+    display: flex;
+    align-items: center;
+    padding: 10px 5px;
+    border-bottom: 1px dashed var(--border-color);
+    gap: 10px;
+    min-height: 40px;
+    flex-wrap: nowrap;
+}
+#schedule-display ul li:last-child { border-bottom: none; }
+
+.schedule-date {
+    flex: 0 0 115px;
+    font-weight: bold;
+    white-space: nowrap;
+    text-align: left;
+    margin:0; padding:0;
+}
+.schedule-conductor { /* Nimmt jetzt mehr Platz ein, da VIP wegfällt */
+    flex: 3 1 250px;
+    text-align: left;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    margin:0; padding:0;
+    min-width: 150px;
+    line-height: 1.4;
+    padding-left: 10px;
+}
+/* .schedule-vip wurde entfernt */
+
+.mvp-selection-required { color: var(--remove-btn); font-weight: bold; }
+
+#schedule-display ul li.current-day {
+    background-color: var(--highlight-bg);
+    font-weight: normal;
+    border-left: 4px solid var(--primary-color);
+}
+#schedule-display ul li.current-day .schedule-date { font-weight: bold; }
+
+#schedule-display ul li.past-day {
+    opacity: 0.7;
+    font-size: 0.95em;
+}
+
+#current-day-info {
+    background-color: var(--highlight-bg);
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 0;
+}
+#last-completed-day-info {
+    margin-top: 0px;
+    padding: 10px 15px;
+    border-bottom: 1px solid var(--border-color);
+    background-color: var(--last-completed-bg);
+    font-size: 0.9em;
+}
+#last-completed-day-info p { margin-bottom: 3px; }
+#current-day-info p { margin-bottom: 8px; }
+
+/* VIPs mit Count 0 Liste */
+.vip-zero-count-section ul {
+    padding: 0;
+    list-style: disc; /* Einfache Punkte für die Liste */
+    margin-left: 20px; /* Einrücken der Punkte */
+    max-height: 200px;
+    overflow-y: auto;
+}
+.vip-zero-count-section ul li {
+    padding: 4px 0;
+    border-bottom: none; /* Keine Linien zwischen den Listenelementen */
+    display: list-item; /* Als normales Listenelement anzeigen */
+    font-size: 0.95em;
+}
+
+
+/* Statistics Section */
+.stats-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+#vip-stats { /* Nimmt jetzt die volle Breite, da MVP Stats weg sind */
+    flex: 1;
+    min-width: 200px;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: var(--card-bg);
+}
+#vip-stats h3 {
+    font-size: 1.1em;
+    margin-bottom: 10px;
+    color: var(--primary-color);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 5px;
+}
+#vip-stats ul {
+    list-style: none;
+    padding: 0;
+    max-height: 300px;
+    overflow-y: auto;
+}
+#vip-stats li {
+    padding: 5px 0;
+    border-bottom: 1px dashed var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9em;
+}
+#vip-stats li:last-child { border-bottom: none; }
+.stats-count {
+    font-weight: bold;
+    margin-left: 10px;
+    min-width: 20px;
+    text-align: right;
+}
+
+.admin-section {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid var(--border-color);
+}
+.admin-section button { margin-right: 10px; }
+
+details > summary {
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1.2em;
+    margin-bottom: 10px;
+    color: var(--accent-color);
+}
+details > summary::marker { color: var(--accent-color); }
+details > summary:hover { opacity: 0.8; }
+details[open] > summary { margin-bottom: 15px; }
+
+/* Mobile Anpassungen */
+@media (max-width: 768px) {
+    body { padding: 5px; }
+    .container { padding: 10px; }
+    h1 { font-size: 1.5em; }
+    h2 { font-size: 1.2em; }
+    button { font-size: 0.9em; padding: 8px 12px; }
+
+    @media (max-width: 650px) {
+        #schedule-display ul li {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+            padding: 8px 5px;
+        }
+        .schedule-date, .schedule-conductor {
+            flex-basis: auto;
+            width: 100%;
+            min-width: unset;
+            padding-left: 0;
+        }
+        .schedule-date { white-space: normal; margin-bottom: 3px; }
+    }
+
+    li:not(#schedule-display ul li) { /* Gilt für Member-Liste, VIP-Count 0, Statistiken */
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    li:not(#schedule-display ul li) span { margin-bottom: 5px; }
+
+    #member-list li { /* Spezifisch für Member-Liste, damit Aktionen daneben bleiben können */
+        flex-direction: row;
+        align-items: center;
+    }
+    #member-list li .member-info { margin-bottom: 0; }
+    .member-actions { margin-top: 5px; margin-left: auto; }
+
+    #vip-stats li { /* Für Statistik-Items auf Mobile */
+       flex-direction: row; /* Name und Count-Controls nebeneinander */
+       align-items: center;
+    }
+
+}
+
+@media (max-width: 480px) {
+    h1 { font-size: 1.3em; }
+    .header { margin-bottom: 15px; }
+    #schedule-display ul li.past-day { font-size: 0.9em; }
+
+    #member-list li { /* Auf sehr kleinen Screens alles untereinander */
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .member-actions { margin-left: 0; margin-top: 8px; }
+}
+
+.inline-edit-name, .inline-edit-count {
+    padding: 4px 6px;
+    font-size: 0.9em;
+    margin-right: 5px;
+    border: 1px solid var(--input-border);
+    border-radius: 3px;
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    margin-bottom: 0; /* Wichtig für Inline-Elemente */
+}
+.inline-edit-name {
+    width: auto;
+    flex-grow: 1;
+    max-width: 150px;
+}
+.inline-edit-count {
+    width: 60px;
+    text-align: right;
+}
+
+.btn-small {
+    padding: 3px 8px;
+    font-size: 0.8em;
+    margin-left: 5px;
+}
+
+#member-list li .member-info { gap: 5px; }
+
+#vip-stats li {
+    justify-content: space-between;
+    align-items: center;
+}
+.stats-name { flex-grow: 1; }
+.stats-controls { display: flex; align-items: center; gap: 5px; margin-left: 10px; }
+.btn-edit-stat { line-height: 1; padding: 4px 6px; }

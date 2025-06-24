@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[rEd] Train Conductor Rotation (v7)</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>[rEd] Train Conductor Rotation</h1>
+            <p>Server #749 (Simplified)</p>
+        </header>
+
+        <section class="controls-section">
+            <h2>Today's Status & Actions</h2>
+            <div id="current-day">
+                <div id="current-day-info">
+                    <p><strong>Date:</strong> <span id="current-date">Loading...</span></p>
+                    <p><strong>Day:</strong> <span id="current-day-of-week">---</span></p>
+                    <p><strong>Conductor:</strong> <span id="current-conductor">---</span></p>
+                </div>
+                <div id="last-completed-day-info">
+                    <p><strong>Last Completed:</strong> <span id="last-completed-date">---</span></p>
+                    <p style="font-size: 0.9em;">Conductor: <span id="last-completed-conductor">---</span>, VIP: <span id="last-completed-vip">---</span></p>
+                </div>
+
+                <div id="mvp-selection-area" style="display:none; margin-top:15px;">
+                    <label for="mvp-select">Select Today's MVP Conductor:</label>
+                    <select id="mvp-select">
+                        <option value="">-- Select MVP --</option>
+                    </select>
+                </div>
+
+                <div id="todays-vip-selection-area" style="margin-top:15px;">
+                    <label for="select-todays-vip">Select Today's VIP:</label>
+                    <select id="select-todays-vip">
+                        <option value="">-- Select VIP --</option>
+                    </select>
+                </div>
+
+                <div id="advance-controls" style="margin-top: 20px;">
+                    <button id="confirm-vip-advance-day" class="btn-primary" disabled>Confirm VIP & Advance Day</button>
+                    <button id="undo-advance" class="btn-secondary" disabled style="margin-left: 10px;">Undo Last Advancement</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="schedule-section">
+             <h2>Upcoming Conductor Schedule</h2>
+             <p>Showing past 3 days and upcoming 14 days of Conductors.</p>
+             <div id="schedule-display"><ul></ul></div>
+        </section>
+
+        <section class="vip-zero-count-section">
+            <h2>Members for VIP (Count 0)</h2>
+            <p>These members currently have a VIP count of 0.</p>
+            <div id="vips-with-zero-count-display"><ul></ul></div>
+            <button id="copy-zero-vip-list" class="btn-secondary" style="margin-top:10px;">Copy List</button>
+        </section>
+
+        <section class="stats-section">
+             <h2>VIP Statistics</h2>
+             <div class="stats-container">
+                 <div id="vip-stats">
+                     <h3>All Member VIP Counts</h3>
+                     <ul></ul>
+                 </div>
+                 <!-- MVP Stats Removed -->
+             </div>
+        </section>
+
+        <section class="member-section">
+            <h2>Manage Alliance Members</h2>
+            <div id="add-member-form-container">
+                 <h3>Add New Member</h3>
+                 <form id="add-member-form" class="form-group">
+                     <label for="new-member-name">Name:</label> <input type="text" id="new-member-name" required>
+                     <label for="new-member-rank">Rank:</label>
+                     <select id="new-member-rank">
+                         <option value="Member">Member</option>
+                         <option value="R4">R4</option>
+                         <option value="R5">R5</option>
+                     </select>
+                     <button type="submit" class="btn-primary" style="margin-top: 10px;">Add Member</button>
+                 </form>
+            </div>
+            <details id="member-list-details" open style="margin-top: 20px; border-top: 1px solid var(--border-color); padding-top: 15px;">
+                <summary> Show/Hide Current Members (<span id="member-count">0</span>) </summary>
+                <ul id="member-list"></ul>
+            </details>
+        </section>
+
+        <section class="admin-section">
+            <h2>Admin</h2>
+            <details>
+                <summary>Show/Hide Admin Controls</summary>
+                <div style="margin-top: 15px;">
+                    <p>Use reset only if absolutely necessary. It resets to coded defaults for THIS version.</p>
+                    <button id="reset-data" class="btn-remove">Reset All Data to Defaults (v7)</button>
+                </div>
+            </details>
+        </section>
+        
+        <footer>
+            <p style="text-align: center; font-size: 0.8em; margin-top: 20px; color: var(--accent-color);">
+                Tool Version: <span id="script-version">?</span>
+            </p>
+        </footer>
+    </div>
+    <script defer src="script.js"></script>
+</body>
+</html>
