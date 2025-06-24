@@ -1,36 +1,31 @@
-const SCRIPT_VERSION = "7.0"; // Simplified VIP Selection, Manual Advance, Zero VIP Count List
+const SCRIPT_VERSION = "7.0.2"; // Debugging for Reset Button & History VIP display
 // --- Firebase Configuration ---
 // !!! ERSETZE DIES MIT DEINER EIGENEN FIREBASE KONFIGURATION FÜR DIE NEUE VERSION !!!
 const firebaseConfig = {
-  apiKey: "AIzaSyAaRF7n14TDhTltcK7ZC_vuSBVeUnd2dtM",
-  authDomain: "red-train-rotation-tool-2.firebaseapp.com",
-  projectId: "red-train-rotation-tool-2",
-  storageBucket: "red-train-rotation-tool-2.firebasestorage.app",
-  messagingSenderId: "638755313613",
-  appId: "1:638755313613:web:42e2e1ce19d4b124fe1684"
+  apiKey: "AIzaSyAaRF7n14TDhTltcK7ZC_vuSBVeUnd2dtM", // Beispiel, ersetzen!
+  authDomain: "red-train-rotation-tool-2.firebaseapp.com", // Beispiel, ersetzen!
+  projectId: "red-train-rotation-tool-2", // Beispiel, ersetzen!
+  storageBucket: "red-train-rotation-tool-2.firebasestorage.app", // Beispiel, ersetzen!
+  messagingSenderId: "638755313613", // Beispiel, ersetzen!
+  appId: "1:638755313613:web:42e2e1ce19d4b124fe1684" // Beispiel, ersetzen!
 };
 try { firebase.initializeApp(firebaseConfig); } catch (e) { console.error("Firebase Init Error", e); alert("Could not initialize Firebase."); }
 const db = firebase.firestore();
-// NEUER DOKUMENTENNAME FÜR DIESE VERSION
 const stateDocRef = db.collection("rotationState").doc("s749_state_v7");
 
 // --- Constants and State ---
-const MVP_TECH_DAY = 1; // Montag
-const MVP_VS_DAY = 0;   // Sonntag
+const MVP_TECH_DAY = 1;
+const MVP_VS_DAY = 0;
 const RANKS = ["Member", "R4", "R5"];
 const NEW_VERSION_START_DATE = "2025-06-24";
 
 let state = {
-    members: [], // Wird aus Firebase oder initialMembersConfig geladen
+    members: [],
     rotationState: {
-        currentDate: null, // Wird aus Firebase oder NEW_VERSION_START_DATE geladen
+        currentDate: null,
         r4r5Index: 0,
-        // memberIndex entfällt für VIP-Rotation
         selectedMvps: {},
-        vipCounts: {}, // Wird aus Firebase oder initialVipCountsConfig geladen
-        // mvpCounts entfällt
-        // alternativeVips entfällt
-        // completedSubstituteVipsThisRound entfällt (da keine automatische VIP-Rotation mehr)
+        vipCounts: {},
         dailyHistory: {}
     },
     previousRotationState: null,
@@ -38,8 +33,6 @@ let state = {
     editingVipCountMemberId: null
 };
 
-// --- Initial Data for THIS Version (v7) ---
-// Wird für Reset oder allerersten Start mit s749_state_v7 verwendet.
 const initialMembersConfig = [
     { id: "ladylaik", name: "LadyLaik", rank: "R5"}, { id: "caretta", name: "Caretta", rank: "R4"},
     { id: "cornflakes", name: "CornFlakes", rank: "R4"}, { id: "davinnie", name: "DaVinnie", rank: "R4"},
@@ -58,7 +51,7 @@ const initialMembersConfig = [
     { id: "dfyra", name: "Dfyra", rank: "Member"}, { id: "dirtyfrenk", name: "diRty freNk", rank: "Member"},
     { id: "egius", name: "Egius", rank: "Member"}, { id: "ever4", name: "Ever4", rank: "Member"},
     { id: "flac", name: "F L A C", rank: "Member"}, { id: "faluche", name: "Faluche", rank: "Member"},
-    { id: "fire", name: "Fire", rank: "Member"}, { id: "firexice", name: "FireXice (Bibot)", rank: "Member"}, // Name angepasst
+    { id: "fire", name: "Fire", rank: "Member"}, { id: "firexice", name: "FireXice (Bibot)", rank: "Member"},
     { id: "foggis", name: "Foggis", rank: "Member"}, { id: "gekkegerrittttt", name: "Gekkegerrittttt", rank: "Member"},
     { id: "ghost", name: "GhósT", rank: "Member"}, { id: "ghthegreat", name: "Ghthegreat", rank: "Member"},
     { id: "goddesninopatra", name: "Goddes Ninopatra", rank: "Member"}, { id: "gorkiules", name: "Gorkiules", rank: "Member"},
@@ -74,7 +67,7 @@ const initialMembersConfig = [
     { id: "leka98", name: "Leka98", rank: "Member"}, { id: "looselemon", name: "LooseLemon", rank: "Member"},
     { id: "lutonian", name: "Lutonian", rank: "Member"}, { id: "malamimi", name: "Mala Mimi", rank: "Member"},
     { id: "megalomanie", name: "Megalomanie", rank: "Member"}, { id: "molkok", name: "Molkok", rank: "Member"},
-    { id: "mran", name: "MRan", rank: "Member"}, { id: "nymblev", name: "NymbleV", rank: "Member"}, // NymbleV von R4 zu Member in deiner Liste? Ich nehme Member an.
+    { id: "mran", name: "MRan", rank: "Member"}, { id: "nymblev", name: "NymbleV", rank: "Member"},
     { id: "ohoimarshall", name: "ohoimarshall", rank: "Member"}, { id: "olabaf", name: "olabaf", rank: "Member"},
     { id: "oliviax", name: "Oliviax", rank: "Member"}, { id: "onlyperseus", name: "OnlyPerseus", rank: "Member"},
     { id: "peckap", name: "Peckap", rank: "Member"}, { id: "prantuan", name: "Prantuan", rank: "Member"},
@@ -90,7 +83,7 @@ const initialMembersConfig = [
     { id: "xic", name: "XiC", rank: "Member"}, { id: "xyz111111", name: "Xyz111111", rank: "Member"},
     { id: "zoorglub", name: "Zoorglub", rank: "Member"}, { id: "aleks1980", name: "АЛЕКС1980", rank: "Member"},
     { id: "zheka", name: "ЖЭКА", rank: "Member"}
-].map(m => { // Ensure unique IDs and lowercase for matching counts
+].map(m => {
     const generatedId = m.id || m.name.toLowerCase().replace(/[^a-z0-9]/gi, '') || generateId();
     return { ...m, id: generatedId };
 });
@@ -112,36 +105,29 @@ const initialVipCountsConfig = {
     "temd": 0, "thefloh": 0, "thefoxxx": 0, "thirteensquid": 1, "tigershana": 0, "vechniy": 0,
     "villanueva1": 0, "xic": 0, "xyz111111": 0, "zoorglub": 1, "aleks1980": 0, "zheka": 0
 };
-// Helper to map initial counts to member IDs
+
 function getInitialVipCountsWithIds(members, countsConfig) {
     const vipCounts = {};
     members.forEach(member => {
-        const normalizedName = member.name.toLowerCase().replace(/[^a-z0-9]/gi, ''); // Simple normalization
         let foundCount = 0;
-        // Try to find a match in countsConfig, allowing for some flexibility
-        for (const configName in countsConfig) {
-            if (normalizedName.includes(configName.toLowerCase().replace(/[^a-z0-9]/gi, '')) || 
-                configName.toLowerCase().replace(/[^a-z0-9]/gi, '').includes(normalizedName)) {
-                foundCount = countsConfig[configName];
-                break;
-            }
-        }
-         // Fallback if no direct match, check if member.name is a key
-        if (foundCount === 0 && countsConfig[member.name] !== undefined) {
-            foundCount = countsConfig[member.name];
+        // Versuche, einen passenden Eintrag in countsConfig zu finden,
+        // basierend auf der normalisierten ID, die wir für initialMembersConfig generieren
+        const memberKeyForLookup = member.name.toLowerCase().replace(/[^a-z0-9]/gi, '');
+        if (countsConfig[memberKeyForLookup] !== undefined) {
+            foundCount = countsConfig[memberKeyForLookup];
+        } else if (countsConfig[member.name] !== undefined) { // Fallback auf exakten Namen
+             foundCount = countsConfig[member.name];
         }
         vipCounts[member.id] = foundCount;
-
     });
-    // Ensure all members from initialMembersConfig have an entry, default to 0 if not in countsConfig
-    initialMembersConfig.forEach(m => {
+    initialMembersConfig.forEach(m => { // Sicherstellen, dass alle einen Eintrag haben
         if (vipCounts[m.id] === undefined) {
-            vipCounts[m.id] = 0; // Default to 0 if somehow missed
+            console.warn(`Count for ${m.name} (ID: ${m.id}) not found in initialVipCountsConfig, defaulting to 0.`);
+            vipCounts[m.id] = 0; 
         }
     });
     return vipCounts;
 }
-
 
 // --- DOM Elements ---
 const memberListEl = document.getElementById('member-list');
@@ -152,16 +138,14 @@ const memberCountEl = document.getElementById('member-count');
 const currentDateEl = document.getElementById('current-date');
 const currentDayOfWeekEl = document.getElementById('current-day-of-week');
 const currentConductorEl = document.getElementById('current-conductor');
-// const currentVipEl = document.getElementById('current-vip'); // Removed, VIP selected manually
 const scheduleDisplayListEl = document.getElementById('schedule-display').querySelector('ul');
 const undoAdvanceBtn = document.getElementById('undo-advance');
 const mvpSelectionArea = document.getElementById('mvp-selection-area');
 const mvpSelect = document.getElementById('mvp-select');
 const resetBtn = document.getElementById('reset-data');
-// const mvpStatsListEl = document.getElementById('mvp-stats').querySelector('ul'); // Removed
 const vipStatsListEl = document.getElementById('vip-stats').querySelector('ul');
-const todaysVipSelect = document.getElementById('select-todays-vip'); // New VIP selection dropdown
-const confirmVipAdvanceDayBtn = document.getElementById('confirm-vip-advance-day'); // New button
+const todaysVipSelect = document.getElementById('select-todays-vip');
+const confirmVipAdvanceDayBtn = document.getElementById('confirm-vip-advance-day');
 const lastCompletedDateEl = document.getElementById('last-completed-date');
 const lastCompletedConductorEl = document.getElementById('last-completed-conductor');
 const lastCompletedVipEl = document.getElementById('last-completed-vip');
@@ -189,32 +173,31 @@ function calculateDailyConductor(targetDateStr, currentR4R5Index, selectedMvpsMa
         console.error("calculateDailyConductor: Invalid targetDate from string", targetDateStr);
         return { id: 'ERR_DATE_COND', name: 'Date Error Conductor', rank: 'Sys' };
     }
-
     const dayOfWeek = getDayOfWeek(targetDate);
     let conductor = null;
     const r4r5Members = getMembersByRank('R4/R5');
-
-    if (dayOfWeek === MVP_TECH_DAY) { // Montag
+    if (dayOfWeek === MVP_TECH_DAY) {
         const mvpKey = `${targetDateStr}_Mon`;
         const mvpId = selectedMvpsMap[mvpKey];
         conductor = mvpId ? getMemberById(mvpId) : { id: 'MVP_MON_SELECT', name: 'Tech MVP Needed', rank: 'MVP' };
-    } else if (dayOfWeek === MVP_VS_DAY) { // Sonntag
+    } else if (dayOfWeek === MVP_VS_DAY) {
         const mvpKey = `${targetDateStr}_Sun`;
         const mvpId = selectedMvpsMap[mvpKey];
         conductor = mvpId ? getMemberById(mvpId) : { id: 'MVP_SUN_SELECT', name: 'VS MVP Needed', rank: 'MVP' };
-    } else { // Reguläre Tage
+    } else {
         conductor = r4r5Members.length > 0 ? r4r5Members[currentR4R5Index % r4r5Members.length] : { id: 'NO_R4R5', name: 'No R4/R5', rank: 'Sys' };
     }
     return conductor || { id: 'ERR_COND_FALLBACK', name: 'Err Conductor Fallback', rank: 'Sys' };
 }
 
-function recordDailyHistory(dateStr, conductorId, vipId, status = 'Confirmed') { // Status optional
+function recordDailyHistory(dateStr, conductorId, vipId, status = 'Confirmed') {
     if (!dateStr || !conductorId || !vipId) {
         console.warn("recordDailyHistory: Missing data for history entry", { dateStr, conductorId, vipId, status });
         return;
     }
     const conductor = getMemberById(conductorId);
     const vip = getMemberById(vipId);
+    console.log("In recordDailyHistory - vipId:", vipId, "Found vip object:", vip); // DEBUG LOG FOR VIP IN HISTORY
 
     if (!state.rotationState.dailyHistory) {
         state.rotationState.dailyHistory = {};
@@ -228,6 +211,7 @@ function recordDailyHistory(dateStr, conductorId, vipId, status = 'Confirmed') {
         vipRank: vip ? vip.rank : 'N/A',
         status: status
     };
+    console.log("Recorded history for:", dateStr, JSON.parse(JSON.stringify(state.rotationState.dailyHistory[dateStr]))); // DEBUG LOG
 }
 
 async function handleConfirmVipAndAdvanceDay() {
@@ -235,7 +219,6 @@ async function handleConfirmVipAndAdvanceDay() {
         alert("Rotation state is not loaded.");
         return;
     }
-
     const selectedVipId = todaysVipSelect.value;
     if (!selectedVipId) {
         alert("Please select Today's VIP from the dropdown.");
@@ -248,7 +231,6 @@ async function handleConfirmVipAndAdvanceDay() {
     const dayOfWeek = getDayOfWeek(currentDate);
     let finalConductorId = null;
 
-    // MVP-Logik für Conductor
     if (dayOfWeek === MVP_TECH_DAY || dayOfWeek === MVP_VS_DAY) {
         const mvpKey = dayOfWeek === MVP_TECH_DAY ? `${currentDateStr}_Mon` : `${currentDateStr}_Sun`;
         const existingMvp = state.rotationState.selectedMvps?.[mvpKey];
@@ -262,10 +244,9 @@ async function handleConfirmVipAndAdvanceDay() {
                 return;
             }
             finalConductorId = selectedMvpForTodayId;
-            state.rotationState.selectedMvps[mvpKey] = selectedMvpForTodayId; // MVP Auswahl speichern
-            // MVP Count für den MVP Conductor wird hier nicht mehr separat gezählt
+            state.rotationState.selectedMvps[mvpKey] = selectedMvpForTodayId;
         }
-    } else { // Regulärer Conductor
+    } else {
         const r4r5Members = getMembersByRank('R4/R5');
         if (r4r5Members.length > 0) {
             finalConductorId = r4r5Members[state.rotationState.r4r5Index % r4r5Members.length].id;
@@ -282,45 +263,39 @@ async function handleConfirmVipAndAdvanceDay() {
     confirmVipAdvanceDayBtn.disabled = true;
     undoAdvanceBtn.disabled = true;
 
-    // VIP Count für den ausgewählten VIP erhöhen
     if (!state.rotationState.vipCounts) state.rotationState.vipCounts = {};
     state.rotationState.vipCounts[selectedVipId] = (state.rotationState.vipCounts[selectedVipId] || 0) + 1;
 
-    // Historie schreiben
+    console.log("VIP selected for history:", selectedVipId, "Member object:", getMemberById(selectedVipId)); // DEBUG LOG FOR VIP
     recordDailyHistory(currentDateStr, finalConductorId, selectedVipId, 'Confirmed');
 
-    // Nächsten Tag vorbereiten
     let nextR4R5Index = state.rotationState.r4r5Index ?? 0;
-    if (dayOfWeek >= 2 && dayOfWeek <= 6) { // Di-Sa (Nicht-MVP-Tage)
+    if (dayOfWeek >= 2 && dayOfWeek <= 6) {
         nextR4R5Index = (nextR4R5Index + 1);
     }
     const nextDate = addDays(currentDate, 1);
     const nextDateStr = getISODateString(nextDate);
 
-    // State für Undo sichern
     try {
-        state.previousRotationState = JSON.parse(JSON.stringify(state.rotationState));
+        const stateToBackup = JSON.parse(JSON.stringify(state.rotationState)); // Backup only rotationState
+        console.log("Saving current state to previousRotationState for undo:", stateToBackup); // DEBUG LOG
+        state.previousRotationState = stateToBackup;
     } catch (e) {
         console.error("Error creating previousRotationState for advance:", e);
         state.previousRotationState = null;
     }
 
-    // State aktualisieren
     state.rotationState.currentDate = nextDateStr;
     state.rotationState.r4r5Index = nextR4R5Index;
-    // memberIndex, alternativeVips, completedSubstituteVipsThisRound sind nicht mehr relevant für Hauptrotation
 
     try {
         await updateFirestoreState();
-        // render() wird durch onSnapshot aufgerufen
     } catch (error) {
         console.error("Failed to save state after advancing day:", error);
         alert("Error saving data. The day might not have advanced correctly.");
-        // Buttons im Fehlerfall wiederherstellen
-        renderCurrentDay(); // Um Button-Status ggf. zu korrigieren
+        renderCurrentDay();
     }
 }
-
 
 function updateFirestoreState() {
     const stateToSave = JSON.parse(JSON.stringify({
@@ -328,52 +303,36 @@ function updateFirestoreState() {
         rotationState: {
             currentDate: state.rotationState.currentDate,
             r4r5Index: state.rotationState.r4r5Index ?? 0,
-            // memberIndex nicht mehr speichern (da VIP manuell)
             selectedMvps: state.rotationState.selectedMvps || {},
             vipCounts: state.rotationState.vipCounts || {},
-            // mvpCounts nicht mehr speichern
             dailyHistory: state.rotationState.dailyHistory || {}
-            // alternativeVips, completedSubstituteVipsThisRound nicht mehr speichern
         }
     }));
     delete stateToSave.editingMemberId;
     delete stateToSave.editingVipCountMemberId;
-
     return stateDocRef.set(stateToSave)
         .then(() => { /* console.log("Firestore state updated successfully."); */ })
         .catch((e) => { console.error("Firestore write FAIL:", e); alert(`Save Error: ${e.message}`); throw e; });
 }
 
-// --- Member Management ---
-// addMember, removeMember, handleRankChange, saveNewName werden vereinfacht,
-// da die komplexe memberIndex-Anpassung für VIPs entfällt.
-// Sie müssen nur noch die state.members Liste pflegen und sortMembers() aufrufen.
-
 function addMember(event) {
     event.preventDefault();
     const name = newMemberNameInput.value.trim();
     const rank = newMemberRankSelect.value;
-    if (!name || !rank) {
-        alert("Name and Rank are required to add a member.");
-        return;
-    }
+    if (!name || !rank) { alert("Name and Rank are required."); return; }
     if (!Array.isArray(state.members)) state.members = [];
     if (state.members.some(m => m?.name.toLowerCase() === name.toLowerCase())) {
-        alert(`Member with name "${name}" already exists.`);
-        return;
+        alert(`Member with name "${name}" already exists.`); return;
     }
     const newMember = { id: generateId(), name: name, rank: rank };
     state.members.push(newMember);
     sortMembers();
-
-    // VIP Count für neues Mitglied initialisieren (falls es ein Member ist)
     if (rank === 'Member') {
         if (!state.rotationState.vipCounts) state.rotationState.vipCounts = {};
-        state.rotationState.vipCounts[newMember.id] = 0; // Neue Member starten mit 0 VIPs
+        state.rotationState.vipCounts[newMember.id] = 0;
     }
-
     updateFirestoreState().then(() => {
-        render(); // Umfassendes Rendern, um alle Listen (inkl. VIP 0 Liste) zu aktualisieren
+        render();
         newMemberNameInput.value = '';
         newMemberRankSelect.value = 'Member';
     });
@@ -382,13 +341,11 @@ function addMember(event) {
 function removeMember(id) {
     const member = getMemberById(id);
     if (!member) return;
-    if (confirm(`Are you sure you want to remove ${member.name}? This action cannot be undone.`)) {
+    if (confirm(`Are you sure you want to remove ${member.name}?`)) {
         state.members = state.members.filter(mb => mb?.id !== id);
-        // VIP Count des entfernten Mitglieds auch löschen
         if (state.rotationState.vipCounts && state.rotationState.vipCounts[id] !== undefined) {
             delete state.rotationState.vipCounts[id];
         }
-        // Aus selectedMvps entfernen, falls es dort als MVP für einen Tag gespeichert war
         if (state.rotationState.selectedMvps) {
             for (const key in state.rotationState.selectedMvps) {
                 if (state.rotationState.selectedMvps[key] === id) {
@@ -396,7 +353,6 @@ function removeMember(id) {
                 }
             }
         }
-        // sortMembers() ist nicht unbedingt nötig nach dem Filtern, aber schadet nicht für Konsistenz
         sortMembers(); 
         updateFirestoreState().then(render);
     }
@@ -407,20 +363,14 @@ function handleRankChange(event) {
     const memberId = selectElement.dataset.memberId;
     const newRank = selectElement.value;
     const member = getMemberById(memberId);
-
     if (!member) { console.error("Member not found for rank change:", memberId); return; }
     const oldRank = member.rank;
     if (oldRank === newRank) return;
-
     if (confirm(`Change ${member.name}'s rank from ${oldRank} to ${newRank}?`)) {
         member.rank = newRank;
-        // Wenn ein Mitglied von/zu Member wechselt, VIP Count ggf. initialisieren/beibehalten
         if (newRank === 'Member' && (state.rotationState.vipCounts?.[memberId] === undefined)) {
             if (!state.rotationState.vipCounts) state.rotationState.vipCounts = {};
-            state.rotationState.vipCounts[memberId] = 0; // Neuer Member startet mit 0
-        } else if (oldRank === 'Member' && newRank !== 'Member') {
-            // VIP Count könnte beibehalten oder gelöscht werden. Wir behalten ihn für historische Zwecke.
-            // Aber es wird nicht mehr in der "VIPs mit Count 0" Liste erscheinen.
+            state.rotationState.vipCounts[memberId] = 0;
         }
         sortMembers();
         updateFirestoreState().then(render);
@@ -448,18 +398,15 @@ function toggleRenameMode(memberId) {
 
 async function saveNewName(memberId, newNameInput) {
     const newName = newNameInput.value.trim();
-    if (!newName) {
-        alert("Name cannot be empty."); newNameInput.focus(); return;
-    }
+    if (!newName) { alert("Name cannot be empty."); newNameInput.focus(); return; }
     const originalMember = getMemberById(memberId);
     if (!originalMember) return;
-
     if (state.members.some(m => m.id !== memberId && m.name.toLowerCase() === newName.toLowerCase())) {
         alert(`Another member with the name "${newName}" already exists.`); newNameInput.focus(); return;
     }
     originalMember.name = newName;
     state.editingMemberId = null;
-    sortMembers(); // Nur sortieren, keine Index-Anpassung mehr nötig für VIP-Rotation
+    sortMembers();
     try {
         await updateFirestoreState();
         render();
@@ -468,61 +415,32 @@ async function saveNewName(memberId, newNameInput) {
     }
 }
 
-// --- Rendering Functions ---
 function renderMemberList() {
     memberListEl.innerHTML = '';
     if (!Array.isArray(state.members)) { memberCountEl.textContent = '0'; return; }
     memberCountEl.textContent = state.members.length;
     sortMembers();
     if (state.members.length === 0) { memberListEl.innerHTML = '<li>No members.</li>'; return; }
-
     state.members.forEach(member => {
         if (!member?.id || !member.name || !member.rank) return;
-        const li = document.createElement('li');
-        li.dataset.memberId = member.id;
-        const infoDiv = document.createElement('div');
-        infoDiv.classList.add('member-info');
+        const li = document.createElement('li'); li.dataset.memberId = member.id;
+        const infoDiv = document.createElement('div'); infoDiv.classList.add('member-info');
         if (state.editingMemberId === member.id) {
-            const nameInput = document.createElement('input');
-            nameInput.type = 'text'; nameInput.value = member.name; nameInput.classList.add('inline-edit-name');
-            infoDiv.appendChild(nameInput);
-            const saveNameBtn = document.createElement('button');
-            saveNameBtn.textContent = 'Save'; saveNameBtn.classList.add('btn-primary', 'btn-small');
-            saveNameBtn.onclick = () => saveNewName(member.id, nameInput);
-            infoDiv.appendChild(saveNameBtn);
-            const cancelNameBtn = document.createElement('button');
-            cancelNameBtn.textContent = 'Cancel'; cancelNameBtn.classList.add('btn-secondary', 'btn-small');
-            cancelNameBtn.onclick = () => toggleRenameMode(member.id);
-            infoDiv.appendChild(cancelNameBtn);
+            const nameInput = document.createElement('input'); nameInput.type = 'text'; nameInput.value = member.name; nameInput.classList.add('inline-edit-name'); infoDiv.appendChild(nameInput);
+            const saveNameBtn = document.createElement('button'); saveNameBtn.textContent = 'Save'; saveNameBtn.classList.add('btn-primary', 'btn-small'); saveNameBtn.onclick = () => saveNewName(member.id, nameInput); infoDiv.appendChild(saveNameBtn);
+            const cancelNameBtn = document.createElement('button'); cancelNameBtn.textContent = 'Cancel'; cancelNameBtn.classList.add('btn-secondary', 'btn-small'); cancelNameBtn.onclick = () => toggleRenameMode(member.id); infoDiv.appendChild(cancelNameBtn);
         } else {
-            const nameSpan = document.createElement('span');
-            nameSpan.textContent = member.name; nameSpan.classList.add('member-name-display');
-            infoDiv.appendChild(nameSpan);
-            const rankSelect = document.createElement('select');
-            rankSelect.classList.add('rank-select-inline'); rankSelect.dataset.memberId = member.id;
-            RANKS.forEach(rankValue => {
-                const option = document.createElement('option');
-                option.value = rankValue; option.textContent = rankValue;
-                if (member.rank === rankValue) option.selected = true;
-                rankSelect.appendChild(option);
-            });
-            rankSelect.addEventListener('change', handleRankChange);
-            infoDiv.appendChild(rankSelect);
+            const nameSpan = document.createElement('span'); nameSpan.textContent = member.name; nameSpan.classList.add('member-name-display'); infoDiv.appendChild(nameSpan);
+            const rankSelect = document.createElement('select'); rankSelect.classList.add('rank-select-inline'); rankSelect.dataset.memberId = member.id;
+            RANKS.forEach(rankValue => { const option = document.createElement('option'); option.value = rankValue; option.textContent = rankValue; if (member.rank === rankValue) option.selected = true; rankSelect.appendChild(option); });
+            rankSelect.addEventListener('change', handleRankChange); infoDiv.appendChild(rankSelect);
         }
-        const actionsDiv = document.createElement('div');
-        actionsDiv.classList.add('member-actions');
+        const actionsDiv = document.createElement('div'); actionsDiv.classList.add('member-actions');
         if (state.editingMemberId !== member.id) {
-            const renameButton = document.createElement('button');
-            renameButton.textContent = 'Rename'; renameButton.classList.add('btn-secondary', 'btn-small');
-            renameButton.onclick = () => toggleRenameMode(member.id);
-            actionsDiv.appendChild(renameButton);
-            const removeButton = document.createElement('button');
-            removeButton.textContent = 'Remove'; removeButton.classList.add('btn-remove', 'btn-small');
-            removeButton.onclick = () => removeMember(member.id);
-            actionsDiv.appendChild(removeButton);
+            const renameButton = document.createElement('button'); renameButton.textContent = 'Rename'; renameButton.classList.add('btn-secondary', 'btn-small'); renameButton.onclick = () => toggleRenameMode(member.id); actionsDiv.appendChild(renameButton);
+            const removeButton = document.createElement('button'); removeButton.textContent = 'Remove'; removeButton.classList.add('btn-remove', 'btn-small'); removeButton.onclick = () => removeMember(member.id); actionsDiv.appendChild(removeButton);
         }
-        li.appendChild(infoDiv); li.appendChild(actionsDiv);
-        memberListEl.appendChild(li);
+        li.appendChild(infoDiv); li.appendChild(actionsDiv); memberListEl.appendChild(li);
     });
 }
 
@@ -530,19 +448,12 @@ function renderCurrentDay() {
     if (!state.rotationState?.currentDate) { currentDateEl.textContent = "Loading state..."; return; }
     const currentDateStr = state.rotationState.currentDate;
     const currentDate = new Date(currentDateStr + 'T00:00:00Z');
-
-    if (isNaN(currentDate)) {
-        currentDateEl.textContent = "Invalid Date!"; currentDayOfWeekEl.textContent = "---";
-        currentConductorEl.textContent = "---"; confirmVipAdvanceDayBtn.disabled = true; return;
-    }
-
+    if (isNaN(currentDate)) { currentDateEl.textContent = "Invalid Date!"; currentDayOfWeekEl.textContent = "---"; currentConductorEl.textContent = "---"; confirmVipAdvanceDayBtn.disabled = true; return; }
     const dayOfWeek = getDayOfWeek(currentDate);
     const safeSelectedMvps = state.rotationState.selectedMvps || {};
     const calculatedConductor = calculateDailyConductor(currentDateStr, state.rotationState.r4r5Index ?? 0, safeSelectedMvps);
-
     currentDateEl.textContent = formatDate(currentDate);
     currentDayOfWeekEl.textContent = currentDate.toLocaleDateString('en-US', { weekday: 'long' });
-
     let isMvpSelectionNeededToday = false;
     if (dayOfWeek === MVP_TECH_DAY || dayOfWeek === MVP_VS_DAY) {
         const mvpKey = dayOfWeek === MVP_TECH_DAY ? `${currentDateStr}_Mon` : `${currentDateStr}_Sun`;
@@ -553,230 +464,145 @@ function renderCurrentDay() {
             mvpSelectionArea.style.display = 'none';
         } else {
             currentConductorEl.innerHTML = `<span class="mvp-selection-required">${calculatedConductor.name}</span>`;
-            populateMvpSelect(); // MVP Dropdown füllen
-            mvpSelectionArea.style.display = 'block';
-            mvpSelect.value = "";
-            isMvpSelectionNeededToday = true;
+            populateMvpSelect(); mvpSelectionArea.style.display = 'block'; mvpSelect.value = ""; isMvpSelectionNeededToday = true;
         }
     } else {
         currentConductorEl.textContent = `${calculatedConductor.name} (${calculatedConductor.rank})`;
         mvpSelectionArea.style.display = 'none';
     }
-    
-    populateTodaysVipSelect(); // VIP Dropdown immer füllen
-    todaysVipSelect.value = ""; // Auswahl zurücksetzen
-
-    // Button-Logik: Aktivieren, wenn MVP (falls nötig) UND VIP ausgewählt wurden
-    const isVipSelected = todaysVipSelect.value !== "";
-    confirmVipAdvanceDayBtn.disabled = isMvpSelectionNeededToday || !isVipSelected; // Startet disabled bis VIP gewählt
-
+    populateTodaysVipSelect(); todaysVipSelect.value = "";
+    const isVipSelected = todaysVipSelect.value !== ""; // Wird nach Reset "" sein
+    confirmVipAdvanceDayBtn.disabled = isMvpSelectionNeededToday || !isVipSelected;
     undoAdvanceBtn.disabled = !state.previousRotationState;
 }
 
-function populateMvpSelect() { // Bleibt wie bisher: Alle Member als potenzielle MVPs
+function populateMvpSelect() {
     mvpSelect.innerHTML = '<option value="">-- Select MVP --</option>';
     if (!Array.isArray(state.members)) return;
-    const memberRankMembers = getMembersByRank('Member'); // Nur Member für MVP Auswahl
-    memberRankMembers.forEach(m => {
-        if (!m?.id) return;
-        const option = document.createElement('option');
-        option.value = m.id;
-        option.textContent = `${m.name} (Member)`;
-        mvpSelect.appendChild(option);
-    });
+    const memberRankMembers = getMembersByRank('Member');
+    memberRankMembers.forEach(m => { if (!m?.id) return; const option = document.createElement('option'); option.value = m.id; option.textContent = `${m.name} (Member)`; mvpSelect.appendChild(option); });
 }
 
 function populateTodaysVipSelect() {
     todaysVipSelect.innerHTML = '<option value="">-- Select Today\'s VIP --</option>';
-    const members = getMembersByRank('Member'); // Alle Member zur Auswahl
-    if (!members || members.length === 0) {
-        const option = document.createElement('option');
-        option.textContent = "No members available";
-        option.disabled = true;
-        todaysVipSelect.appendChild(option);
-        return;
-    }
-    members.forEach(member => {
-        if (!member?.id) return;
-        const option = document.createElement('option');
-        option.value = member.id;
-        option.textContent = `${member.name} (VIPs: ${state.rotationState.vipCounts?.[member.id] || 0})`;
-        todaysVipSelect.appendChild(option);
-    });
+    const members = getMembersByRank('Member');
+    if (!members || members.length === 0) { const option = document.createElement('option'); option.textContent = "No members available"; option.disabled = true; todaysVipSelect.appendChild(option); return; }
+    members.forEach(member => { if (!member?.id) return; const option = document.createElement('option'); option.value = member.id; option.textContent = `${member.name} (VIPs: ${state.rotationState.vipCounts?.[member.id] || 0})`; todaysVipSelect.appendChild(option); });
 }
 
-
-function renderSchedule() { // Zeigt nur Conductor Schedule
+function renderSchedule() {
     scheduleDisplayListEl.innerHTML = '';
-    if (!state.rotationState?.currentDate || !state.members) {
-        scheduleDisplayListEl.innerHTML = '<li>Schedule not ready...</li>'; return;
-    }
+    if (!state.rotationState?.currentDate || !state.members) { scheduleDisplayListEl.innerHTML = '<li>Schedule not ready...</li>'; return; }
     const history = state.rotationState.dailyHistory || {};
     const todayForSchedule = new Date(state.rotationState.currentDate + 'T00:00:00Z');
     if (isNaN(todayForSchedule)) { scheduleDisplayListEl.innerHTML = '<li>Error: Invalid date.</li>'; return; }
-
-    const daysToShowPast = 3;
-    const futureDaysNeeded = 14;
-
-    for (let i = daysToShowPast; i >= 1; i--) { // Vergangene Tage
-        const pastDate = addDays(todayForSchedule, -i);
-        const pastDateStr = getISODateString(pastDate);
+    const daysToShowPast = 3; const futureDaysNeeded = 14;
+    for (let i = daysToShowPast; i >= 1; i--) {
+        const pastDate = addDays(todayForSchedule, -i); const pastDateStr = getISODateString(pastDate);
         const historyEntry = history[pastDateStr];
         const li = document.createElement('li'); li.classList.add('past-day');
         const dateSpan = document.createElement('span'); dateSpan.classList.add('schedule-date'); dateSpan.textContent = formatDate(pastDate);
         const conductorSpan = document.createElement('span'); conductorSpan.classList.add('schedule-conductor');
+        const vipSpan = document.createElement('span'); vipSpan.classList.add('schedule-vip'); // Behalten für Struktur, aber Inhalt ändern
         if (historyEntry) {
             conductorSpan.textContent = `C: ${historyEntry.conductorName} (${historyEntry.conductorRank || 'N/A'})`;
+            vipSpan.textContent = `VIP: ${historyEntry.vipName} (${historyEntry.vipRank || 'N/A'})`; // Zeige den historischen VIP
         } else {
             conductorSpan.textContent = `C: (No history)`;
+            vipSpan.textContent = `VIP: (No history)`;
         }
-        li.appendChild(dateSpan); li.appendChild(conductorSpan);
+        li.appendChild(dateSpan); li.appendChild(conductorSpan); li.appendChild(vipSpan); // vipSpan wieder hinzufügen
         scheduleDisplayListEl.appendChild(li);
     }
-
-    let simDate = new Date(todayForSchedule);
-    let simR4R5Idx = state.rotationState.r4r5Index ?? 0;
+    let simDate = new Date(todayForSchedule); let simR4R5Idx = state.rotationState.r4r5Index ?? 0;
     let simMvps = JSON.parse(JSON.stringify(state.rotationState.selectedMvps || {}));
-
-    for (let i = 0; i < futureDaysNeeded; i++) { // Aktueller und zukünftige Tage
+    for (let i = 0; i < futureDaysNeeded; i++) {
         if (isNaN(simDate)) { break; }
-        const dateStr = getISODateString(simDate);
-        const dayOfWeek = getDayOfWeek(simDate);
-        const isCurrentDay = (i === 0);
+        const dateStr = getISODateString(simDate); const dayOfWeek = getDayOfWeek(simDate); const isCurrentDay = (i === 0);
         const conductor = calculateDailyConductor(dateStr, simR4R5Idx, simMvps);
-
-        const li = document.createElement('li');
-        if (isCurrentDay) li.classList.add('current-day');
+        const li = document.createElement('li'); if (isCurrentDay) li.classList.add('current-day');
         const dateSpan = document.createElement('span'); dateSpan.classList.add('schedule-date'); dateSpan.textContent = formatDate(simDate);
         const conductorSpan = document.createElement('span'); conductorSpan.classList.add('schedule-conductor');
-        const conductorName = conductor.name || "?";
-        const conductorRank = conductor.rank || "N/A";
-
+        const conductorName = conductor.name || "?"; const conductorRank = conductor.rank || "N/A";
         if (conductor.id === 'MVP_MON_SELECT' || conductor.id === 'MVP_SUN_SELECT') {
             const mvpKeyToCheck = dayOfWeek === MVP_TECH_DAY ? `${dateStr}_Mon` : `${dateStr}_Sun`;
-            const simMvpId = simMvps[mvpKeyToCheck]; // Prüfe, ob für diesen simulierten Tag schon ein MVP im State wäre
-            if (simMvpId) { // MVP ist bereits für diesen Tag im (simulierten) State gesetzt
-                const mvpMember = getMemberById(simMvpId);
-                conductorSpan.textContent = `C: ${mvpMember ? mvpMember.name : 'Stored MVP'} (${mvpMember ? mvpMember.rank : 'MVP'})`;
-            } else { // MVP muss noch ausgewählt werden
-                conductorSpan.innerHTML = `<span class="mvp-selection-required">${conductorName}</span>`;
-            }
-        } else {
-            conductorSpan.textContent = `C: ${conductorName} (${conductorRank})`;
-        }
+            const simMvpId = simMvps[mvpKeyToCheck];
+            if (simMvpId) { const mvpMember = getMemberById(simMvpId); conductorSpan.textContent = `C: ${mvpMember ? mvpMember.name : 'Stored MVP'} (${mvpMember ? mvpMember.rank : 'MVP'})`; }
+            else { conductorSpan.innerHTML = `<span class="mvp-selection-required">${conductorName}</span>`; }
+        } else { conductorSpan.textContent = `C: ${conductorName} (${conductorRank})`; }
         li.appendChild(dateSpan); li.appendChild(conductorSpan);
+        const vipPlaceholderSpan = document.createElement('span'); // Placeholder für VIP-Spalte
+        vipPlaceholderSpan.classList.add('schedule-vip');
+        vipPlaceholderSpan.textContent = (isCurrentDay) ? "VIP: (Select from Dropdown)" : "VIP: (Manual Selection)";
+        li.appendChild(vipPlaceholderSpan);
         scheduleDisplayListEl.appendChild(li);
-
-        if (dayOfWeek >= 2 && dayOfWeek <= 6) { simR4R5Idx++; } // Di-Sa
-        simDate = addDays(simDate, 1);
+        if (dayOfWeek >= 2 && dayOfWeek <= 6) { simR4R5Idx++; } simDate = addDays(simDate, 1);
     }
 }
 
 function renderVipsWithZeroCount() {
     vipsWithZeroCountListEl.innerHTML = '';
-    if (!state.members || !state.rotationState.vipCounts) {
-        vipsWithZeroCountListEl.innerHTML = '<li>Loading data...</li>';
-        return;
-    }
+    if (!state.members || !state.rotationState.vipCounts) { vipsWithZeroCountListEl.innerHTML = '<li>Loading data...</li>'; return; }
     const members = getMembersByRank('Member');
     const zeroCountVips = members.filter(m => (state.rotationState.vipCounts[m.id] || 0) === 0);
-    
-    sortMembersByName(zeroCountVips); // Alphabetisch sortieren
-
-    if (zeroCountVips.length === 0) {
-        vipsWithZeroCountListEl.innerHTML = '<li>All members have at least 1 VIP count.</li>';
-        return;
-    }
-    zeroCountVips.forEach(member => {
-        const li = document.createElement('li');
-        li.textContent = member.name;
-        vipsWithZeroCountListEl.appendChild(li);
-    });
+    sortMembersByName(zeroCountVips);
+    if (zeroCountVips.length === 0) { vipsWithZeroCountListEl.innerHTML = '<li>All members have at least 1 VIP count.</li>'; return; }
+    zeroCountVips.forEach(member => { const li = document.createElement('li'); li.textContent = member.name; vipsWithZeroCountListEl.appendChild(li); });
 }
-function sortMembersByName(memberArray) { // Hilfsfunktion zum Sortieren nach Name
+
+function sortMembersByName(memberArray) {
     if (!Array.isArray(memberArray)) return;
     memberArray.sort((a,b) => (a.name || "").localeCompare(b.name || ""));
 }
 
-function toggleEditVipCountMode(memberId) {
+function toggleEditVipCountMode(memberId) { // FEHLENDE FUNKTION HINZUGEFÜGT
     state.editingVipCountMemberId = state.editingVipCountMemberId === memberId ? null : memberId;
-    renderStatistics(); // Ruft renderStatistics erneut auf, um das Edit-Feld anzuzeigen/auszublenden
+    renderStatistics();
 }
 
-async function saveVipCount(memberId, newCountInput) { // Manuelle Anpassung in Statistik
+async function saveVipCount(memberId, newCountInput) {
     const newCountString = newCountInput.value;
     const newCount = parseInt(newCountString, 10);
-    if (isNaN(newCount) || newCount < 0) {
-        alert("VIP count must be a non-negative number."); newCountInput.focus(); return;
-    }
+    if (isNaN(newCount) || newCount < 0) { alert("VIP count must be a non-negative number."); newCountInput.focus(); return; }
     if (!state.rotationState.vipCounts) state.rotationState.vipCounts = {};
     state.rotationState.vipCounts[memberId] = newCount;
     state.editingVipCountMemberId = null;
     try {
         await updateFirestoreState();
-        render(); // Umfassendes Rendern, um VIP 0 Liste und Statistiken zu aktualisieren
+        render();
     } catch (error) {
         alert("Error saving VIP count: " + error.message);
     }
 }
 
-function renderStatistics() { // Zeigt nur noch VIP-Statistiken
+function renderStatistics() {
     vipStatsListEl.innerHTML = '';
-    if (!state.members?.length) {
-        vipStatsListEl.innerHTML = '<li>No members to display stats for.</li>'; return;
-    }
+    if (!state.members?.length) { vipStatsListEl.innerHTML = '<li>No members to display stats for.</li>'; return; }
     const vipCounts = state.rotationState.vipCounts || {};
-    // Nur Mitglieder vom Rang "Member" in der VIP-Statistik anzeigen
     const memberRankMembers = getMembersByRank('Member');
-    sortMembersByName(memberRankMembers); // Alphabetisch sortieren
-
-    if (memberRankMembers.length === 0) {
-        vipStatsListEl.innerHTML = '<li>No "Member" rank members in the alliance.</li>';
-        return;
-    }
-
-    let hasVipStats = false;
+    sortMembersByName(memberRankMembers);
+    if (memberRankMembers.length === 0) { vipStatsListEl.innerHTML = '<li>No "Member" rank members in the alliance.</li>'; return; }
+    let hasVipStats = false; // Um zu prüfen, ob überhaupt Einträge gerendert werden
     memberRankMembers.forEach(member => {
         if (!member?.id || !member.name) return;
         const currentVipCount = vipCounts[member.id] || 0;
-        if (currentVipCount > 0) hasVipStats = true; // Zählt auch, wenn Count 0 ist, um alle anzuzeigen
-
-        const li = document.createElement('li');
-        li.dataset.memberId = member.id;
-        const nameSpan = document.createElement('span');
-        nameSpan.textContent = member.name; nameSpan.classList.add('stats-name');
-        li.appendChild(nameSpan);
-        const controlsDiv = document.createElement('div');
-        controlsDiv.classList.add('stats-controls');
+        // Zeige alle Member in der Statistik, auch mit Count 0
+        hasVipStats = true; 
+        const li = document.createElement('li'); li.dataset.memberId = member.id;
+        const nameSpan = document.createElement('span'); nameSpan.textContent = member.name; nameSpan.classList.add('stats-name'); li.appendChild(nameSpan);
+        const controlsDiv = document.createElement('div'); controlsDiv.classList.add('stats-controls');
         if (state.editingVipCountMemberId === member.id) {
-            const countInput = document.createElement('input');
-            countInput.type = 'number'; countInput.value = currentVipCount; countInput.min = "0";
-            countInput.classList.add('inline-edit-count');
-            controlsDiv.appendChild(countInput);
-            const saveBtn = document.createElement('button');
-            saveBtn.textContent = 'Save'; saveBtn.classList.add('btn-primary', 'btn-small');
-            saveBtn.onclick = () => saveVipCount(member.id, countInput);
-            controlsDiv.appendChild(saveBtn);
-            const cancelBtn = document.createElement('button');
-            cancelBtn.textContent = 'Cancel'; cancelBtn.classList.add('btn-secondary', 'btn-small');
-            cancelBtn.onclick = () => toggleEditVipCountMode(member.id);
-            controlsDiv.appendChild(cancelBtn);
+            const countInput = document.createElement('input'); countInput.type = 'number'; countInput.value = currentVipCount; countInput.min = "0"; countInput.classList.add('inline-edit-count'); controlsDiv.appendChild(countInput);
+            const saveBtn = document.createElement('button'); saveBtn.textContent = 'Save'; saveBtn.classList.add('btn-primary', 'btn-small'); saveBtn.onclick = () => saveVipCount(member.id, countInput); controlsDiv.appendChild(saveBtn);
+            const cancelBtn = document.createElement('button'); cancelBtn.textContent = 'Cancel'; cancelBtn.classList.add('btn-secondary', 'btn-small'); cancelBtn.onclick = () => toggleEditVipCountMode(member.id); controlsDiv.appendChild(cancelBtn);
         } else {
-            const countSpan = document.createElement('span');
-            countSpan.classList.add('stats-count'); countSpan.textContent = currentVipCount;
-            controlsDiv.appendChild(countSpan);
-            const editBtn = document.createElement('button');
-            editBtn.innerHTML = '✎'; editBtn.title = "Edit VIP Count";
-            editBtn.classList.add('btn-secondary', 'btn-small', 'btn-edit-stat');
-            editBtn.onclick = () => toggleEditVipCountMode(member.id);
-            controlsDiv.appendChild(editBtn);
+            const countSpan = document.createElement('span'); countSpan.classList.add('stats-count'); countSpan.textContent = currentVipCount; controlsDiv.appendChild(countSpan);
+            const editBtn = document.createElement('button'); editBtn.innerHTML = '✎'; editBtn.title = "Edit VIP Count"; editBtn.classList.add('btn-secondary', 'btn-small', 'btn-edit-stat'); editBtn.onclick = () => toggleEditVipCountMode(member.id); controlsDiv.appendChild(editBtn);
         }
-        li.appendChild(controlsDiv);
-        vipStatsListEl.appendChild(li);
+        li.appendChild(controlsDiv); vipStatsListEl.appendChild(li);
     });
-
-    if (!hasVipStats && memberRankMembers.length > 0) { // Besser: Prüfen ob überhaupt Einträge generiert wurden
-         if (vipStatsListEl.children.length === 0) vipStatsListEl.innerHTML = '<li>No VIPs have been assigned yet or all have 0.</li>';
+    if (!hasVipStats) { // Sollte nur passieren, wenn memberRankMembers leer ist, was oben abgefangen wird.
+        vipStatsListEl.innerHTML = '<li>No VIPs have been assigned yet.</li>';
     }
 }
 
@@ -785,13 +611,11 @@ function renderLastCompletedDay() {
     lastCompletedConductorEl.textContent = "---";
     lastCompletedVipEl.textContent = "---";
     if (!state.rotationState?.currentDate) return;
-
     const today = new Date(state.rotationState.currentDate + 'T00:00:00Z');
     if (isNaN(today)) return;
     const lastDayDate = addDays(today, -1);
     const lastDateStr = getISODateString(lastDayDate);
     const historyEntry = state.rotationState.dailyHistory?.[lastDateStr];
-
     if (historyEntry) {
         lastCompletedDateEl.textContent = formatDate(lastDayDate);
         lastCompletedConductorEl.textContent = `${historyEntry.conductorName} (${historyEntry.conductorRank || 'N/A'})`;
@@ -808,7 +632,7 @@ function renderLastCompletedDay() {
 
 function render() {
     renderMemberList();
-    renderCurrentDay(); // Füllt auch VIP Dropdown und setzt Button-Status
+    renderCurrentDay();
     renderSchedule();
     renderVipsWithZeroCount();
     renderStatistics();
@@ -817,10 +641,9 @@ function render() {
     if (versionEl) versionEl.textContent = SCRIPT_VERSION;
 }
 
-// --- Event Handlers ---
-function handleMvpAndVipSelectionChange() { // Kombinierter Handler
+function handleMvpAndVipSelectionChange() {
     let isMvpSelectedOrNotNeeded = true;
-    if (mvpSelectionArea.style.display === 'block') { // Nur prüfen, wenn MVP-Auswahl sichtbar ist
+    if (mvpSelectionArea.style.display === 'block') {
         isMvpSelectedOrNotNeeded = mvpSelect.value !== "";
     }
     const isVipSelected = todaysVipSelect.value !== "";
@@ -829,34 +652,91 @@ function handleMvpAndVipSelectionChange() { // Kombinierter Handler
 
 copyZeroVipListBtn.addEventListener('click', () => {
     const listItems = vipsWithZeroCountListEl.getElementsByTagName('li');
-    if (listItems.length === 0 || 
-        (listItems.length === 1 && listItems[0].textContent.startsWith('All members have') || listItems[0].textContent.startsWith('Loading'))) {
-        alert("No VIPs with count 0 to copy.");
-        return;
+    if (listItems.length === 0 || (listItems.length === 1 && (listItems[0].textContent.startsWith('All members have') || listItems[0].textContent.startsWith('Loading')))) {
+        alert("No VIPs with count 0 to copy."); return;
     }
     let textToCopy = "VIP Queue (Count 0):\n";
-    for (let i = 0; i < listItems.length; i++) {
-        textToCopy += `- ${listItems[i].textContent}\n`;
-    }
+    for (let i = 0; i < listItems.length; i++) { textToCopy += `- ${listItems[i].textContent}\n`; }
     navigator.clipboard.writeText(textToCopy)
         .then(() => alert("List of VIPs with count 0 copied to clipboard!"))
-        .catch(err => {
-            console.error('Failed to copy list: ', err);
-            alert("Failed to copy list. Please try again or copy manually.");
-        });
+        .catch(err => { console.error('Failed to copy list: ', err); alert("Failed to copy list."); });
 });
 
+undoAdvanceBtn.addEventListener('click', async () => {
+    console.log("Undo button clicked."); 
+    console.log("Current state.previousRotationState:", JSON.parse(JSON.stringify(state.previousRotationState))); 
 
-// --- Initialization and Realtime Updates ---
+    if (!state.previousRotationState) {
+        alert("No previous state available to undo.");
+        console.log("Undo aborted: state.previousRotationState is null or undefined.");
+        return;
+    }
+    if (confirm("Are you sure you want to undo the last day advancement? This will revert to the previous day's state.")) {
+        console.log("Undo confirmed by user.");
+        undoAdvanceBtn.disabled = true;
+        try {
+            if (typeof state.previousRotationState !== 'object' || state.previousRotationState === null) {
+                console.error("Undo Error: Invalid undo data structure in state.previousRotationState.");
+                throw new Error("Invalid undo data structure.");
+            }
+            console.log("Restoring state from previousRotationState...");
+            state.rotationState = JSON.parse(JSON.stringify(state.previousRotationState));
+            state.previousRotationState = null;
+            console.log("Attempting to save restored state to Firestore...");
+            await updateFirestoreState();
+            console.log("Restored state saved to Firestore. Render should be triggered by onSnapshot.");
+        } catch (error) {
+            console.error("Undo error during processing:", error);
+            alert("Error during undo operation: " + error.message + "\nThe state might be inconsistent.");
+            undoAdvanceBtn.disabled = !state.previousRotationState; 
+        }
+    } else {
+        console.log("Undo cancelled by user.");
+    }
+});
+
+resetBtn.addEventListener('click', async () => {
+    console.log("Reset button clicked.");
+    if (confirm("!! WARNING !! This will reset ALL rotation data (current day, VIP counts, history) to the initial defaults for THIS version (v7). This cannot be undone! Are you absolutely sure?")) {
+        console.log("First confirmation for reset OK.");
+        if (confirm("SECOND WARNING: Confirm again to reset all data. Your current member list and all progress will be lost and replaced by the defaults for this version (v7).")) {
+            console.log("Second confirmation for reset OK. Proceeding with reset.");
+            resetBtn.disabled = true;
+            state.members = initialMembersConfig.map(m => ({ ...m, id: m.id || generateId() }));
+            sortMembers(); 
+            state.rotationState = {
+                currentDate: NEW_VERSION_START_DATE,
+                r4r5Index: 0,
+                selectedMvps: {},
+                vipCounts: getInitialVipCountsWithIds(state.members, initialVipCountsConfig),
+                dailyHistory: {}
+            };
+            state.previousRotationState = null;
+            console.log("State prepared for reset:", JSON.parse(JSON.stringify(state)));
+            try {
+                await updateFirestoreState();
+                alert(`All data has been reset to defaults for v7. The rotation will start from ${formatDate(new Date(NEW_VERSION_START_DATE + 'T00:00:00Z'))}. The page will now refresh to apply changes.`);
+                window.location.reload();
+            } catch (error) {
+                console.error("Reset error:", error);
+                alert("Error resetting data. Please check the console. " + error.message);
+                resetBtn.disabled = false;
+            }
+        } else {
+            console.log("Second confirmation for reset CANCELLED.");
+        }
+    } else {
+        console.log("First confirmation for reset CANCELLED.");
+    }
+});
+
 stateDocRef.onSnapshot((doc) => {
     console.log("Firestore data received/updated for document:", stateDocRef.path);
     const localPrevStateForUndo = state.previousRotationState;
-
     if (doc.exists) {
         const data = doc.data();
         state.members = (data.members || initialMembersConfig).map(m => ({ ...m, id: m.id || generateId() }));
-        sortMembers(); // Sicherstellen, dass Memberliste sofort sortiert ist
-
+        sortMembers();
         const loadedRotState = data.rotationState || {};
         state.rotationState = {
             currentDate: loadedRotState.currentDate || NEW_VERSION_START_DATE,
@@ -865,29 +745,26 @@ stateDocRef.onSnapshot((doc) => {
             vipCounts: loadedRotState.vipCounts || getInitialVipCountsWithIds(state.members, initialVipCountsConfig),
             dailyHistory: loadedRotState.dailyHistory || {}
         };
-        
         let needsSaveToFirebase = false;
         if (!loadedRotState.currentDate || isNaN(new Date(loadedRotState.currentDate + 'T00:00:00Z'))) {
             console.warn("Current date from Firebase is invalid or missing. Resetting to new version start date.");
             state.rotationState.currentDate = NEW_VERSION_START_DATE;
             needsSaveToFirebase = true;
         }
-        if (!loadedRotState.vipCounts) { // Wenn vipCounts nicht im FB-Dokument sind, initialisiere sie.
+        if (!loadedRotState.vipCounts) {
             console.warn("VIP counts not found in Firebase. Initializing with config.");
             state.rotationState.vipCounts = getInitialVipCountsWithIds(state.members, initialVipCountsConfig);
             needsSaveToFirebase = true;
-        } else { // Stelle sicher, dass alle aktuellen Member einen Eintrag in vipCounts haben
+        } else {
             let countsUpdated = false;
             state.members.forEach(member => {
                 if (member.rank === 'Member' && state.rotationState.vipCounts[member.id] === undefined) {
-                    state.rotationState.vipCounts[member.id] = 0; // Neue Member default 0
+                    state.rotationState.vipCounts[member.id] = 0;
                     countsUpdated = true;
                 }
             });
             if(countsUpdated) needsSaveToFirebase = true;
         }
-
-
         const essentialFields = ['currentDate', 'r4r5Index', 'selectedMvps', 'vipCounts', 'dailyHistory'];
         essentialFields.forEach(key => {
             if (state.rotationState[key] === undefined) {
@@ -896,12 +773,10 @@ stateDocRef.onSnapshot((doc) => {
                 needsSaveToFirebase = true;
             }
         });
-        
         if (needsSaveToFirebase) {
             console.log("Attempting to save corrected/initialized state to Firebase due to missing/invalid fields.");
             updateFirestoreState().catch(err => console.error("Automatic state correction save FAIL:", err));
         }
-
     } else {
         console.log(`No existing Firebase document '${stateDocRef.path}' found. Initializing new version state.`);
         state.members = initialMembersConfig.map(m => ({ ...m, id: m.id || generateId() }));
@@ -915,7 +790,7 @@ stateDocRef.onSnapshot((doc) => {
         };
         updateFirestoreState().catch(err => console.error("Initial setup save to Firebase FAIL:", err));
     }
-    state.previousRotationState = localPrevStateForUndo; // Wiederherstellen nach Laden
+    state.previousRotationState = localPrevStateForUndo;
     render();
     resetBtn.disabled = false;
 }, (error) => {
@@ -925,8 +800,8 @@ stateDocRef.onSnapshot((doc) => {
 });
 
 addMemberForm.addEventListener('submit', addMember);
-mvpSelect.addEventListener('change', handleMvpAndVipSelectionChange); // MVP-Auswahl beeinflusst Button
-todaysVipSelect.addEventListener('change', handleMvpAndVipSelectionChange); // VIP-Auswahl beeinflusst Button
+mvpSelect.addEventListener('change', handleMvpAndVipSelectionChange);
+todaysVipSelect.addEventListener('change', handleMvpAndVipSelectionChange);
 confirmVipAdvanceDayBtn.addEventListener('click', handleConfirmVipAndAdvanceDay);
 // undoAdvanceBtn Event Listener ist schon oben
 // resetBtn Event Listener ist schon oben
